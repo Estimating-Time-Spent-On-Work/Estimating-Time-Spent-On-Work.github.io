@@ -60,7 +60,7 @@
     <div class="abstract">
       <h3>Abstract</h3>
       <p>Economics models occupations as bundles of tasks. This task-based framework is the standard lens for understanding how technology affects work: a new technology changes the cost or time each task requires, and these task-level effects aggregate to occupation-level effects. But this aggregation requires a choice of how to weight tasks, and prior work has relied on idiosyncratic or ill-justified weights. While recent work suggests weighting tasks by time spent, existing time shares are either based on coarse O*NET data not intended for this purpose or estimated via black-box language models.</p>
-      <p>We close this gap with a principled method for estimating time shares for nearly 18,000 tasks that constitute nearly all U.S. occupations. Our estimate factors a task's time into (i) the expected frequency of the task, derived from O*NET, and (ii) the time to complete a single instance of it, estimated by solving a constraint satisfaction problem over pairwise comparisons elicited from language models. Applying our time shares to AI exposure, we find that accounting for the share of working <em>time</em> exposed — rather than the share of <em>tasks</em> — widens the gap between the least and most exposed occupations and reshuffles 11 of the 25 occupations widely reported as most exposed, shifting the top of the list away from clerical work and toward analytical roles.</p>
+      <p>We close this gap with a principled method for estimating time shares for nearly 18,000 tasks that constitute nearly all U.S. occupations. Our estimate factors a task's time into (i) the expected frequency of the task, derived from O*NET, and (ii) the time to complete a single instance of it, estimated by solving a constraint satisfaction problem over pairwise comparisons elicited from language models. Applying our time shares to AI exposure, we find that accounting for the share of working <em>time</em> exposed — rather than the share of <em>tasks</em> — widens the gap between the least and most exposed occupations and reshuffles 11 of the 25 occupations widely reported as most exposed in press and policy reports, shifting the top of the list away from clerical work and toward analytical roles.</p>
       <p>We release our time share weights for O*NET 30.2, which can be used as a drop-in replacement for existing task weighting schemes.</p>
     </div>
   </div>
@@ -79,13 +79,6 @@
 
     <div class="figure">
       <div class="figure-body">
-        <div class="controls">
-          <div class="control" style="flex:1 1 100%;">
-            <label>Occupation (O*NET–SOC)</label>
-            <div class="occ-name" id="occName">Massage Therapists</div>
-          </div>
-        </div>
-
         <div class="stats">
           <div class="stat exposed">
             <div class="v" id="f1TaskShare">44%</div>
@@ -118,6 +111,7 @@
       <div class="kicker">Prior Work</div>
       <h2>Many works intend to weight by time — few actually do</h2>
       <p class="lede">
+        Time share is a sensible way to weight tasks when aggregating to the occupation level, but existing time-weights are based on heuristics that need not track time at all or unvalidated, black box language model estimates.<br>
         Our work builds on the task-based framework and can substitute for other approaches to task-to-occupation aggregation. While some prior works state the intent of using time share as the aggregation weights, they often do not in practice: most rely on O*NET metadata such as <strong>importance</strong> scores or the binary <strong>core/supplemental</strong> classification, which is related to time share but conceptually distinct. Table 1 surveys prior approaches and whether they are intended as proxies for time share.
       </p>
     </div>
@@ -153,7 +147,7 @@
       <div class="kicker">Our Method</div>
       <h2>Our Method Details</h2>
       <p class="lede">
-        We factorize each estimate into <strong>(i)</strong> the expected frequency of the task and <strong>(ii)</strong> the time per single instance of the task. Expected task frequency is computed from O*NET incumbent surveys and U.S. labor data. Because no public dataset reports single-instance durations, we prompt a language model to rank task pairs by which takes longer per instance, aggregate those judgments with the Copeland method, and solve a <strong>linear program</strong> grounded in those ordinal constraints plus a 7-hour daily-time budget. The time share is then <em>s(t, o) = w(t, o) · E[f(t, o)]</em>. The full pipeline is summarized in <strong>Figure 2</strong>.
+        We factorize each estimate into <strong>(i)</strong> the expected frequency of the task and <strong>(ii)</strong> the time per single instance of the task. Expected task frequency is computed from O*NET data and U.S. labor data. Because no public dataset reports single-instance durations, and we find that LMs do a poor job of directly outputting sensible estimates, we prompt a LM to rank task pairs by which task takes longer per instance under that assumption that an LM can produce a reasonable ranking. We then aggregate those judgments with the Copeland method, and solve a <strong>linear program</strong> grounded in those ordinal constraints plus a 7-hour daily-time budget. The time share is then <em>s(t, o) = w(t, o) · E[f(t, o)]</em>. The full pipeline is summarized in <strong>Figure 2</strong>.
       </p>
     </div>
 
@@ -175,7 +169,7 @@
       <div class="kicker">Validation</div>
       <h2>Validating our time share estimates</h2>
       <p class="lede">
-        Because our time shares are the byproduct of a multi-step method, we validate its three components: the size of the feasible set of the constraint problem, the LM-induced ranking of single-instance times, and the O*NET daily task frequencies. Across 879 occupations the <strong>feasible region is concentrated</strong> around our reported solution (the most different sampled weight vectors differ by an average of just 1.5 hours across all tasks, against a 7-hour day). And for full-time workers we recruit from five occupations — <strong>human resources managers, lawyers, secretaries and administrative assistants, software developers, and customer service representatives</strong> — our LP-implied ranking is <strong>positively correlated with the human-induced ranking</strong> (Kendall's τ from 0.50 to 0.66), agreeing with the human consensus about as well as a typical individual worker does.
+        We validate the three components of our method: the size of the feasible set of the constraint problem, the LM-induced ranking of single-instance times, and the expected O*NET daily task frequencies. Across 879 occupations the <strong>feasible region is concentrated</strong> around our reported solution (the most different sampled weight vectors differ by an average of just 1.5 hours across all tasks, against a 7-hour day). And for full-time workers we recruit from five occupations — <strong>human resources managers, lawyers, secretaries and administrative assistants, software developers, and customer service representatives</strong> — our LP-implied ranking is <strong>positively correlated with the human-induced ranking</strong> (Kendall's τ from 0.50 to 0.66), agreeing with the human consensus about as well as a typical individual worker does.
       </p>
     </div>
 
@@ -204,7 +198,7 @@
       <div class="kicker">Accounting for Time Share</div>
       <h2>Time weights reshuffle the 25 most AI-exposed occupations</h2>
       <p class="lede">
-        Government, industry, and the public are intensely concerned with how AI will affect jobs, and the most-exposed-occupation lists from prior work are widely covered in press and policy reports <span class="cites">[<a href="https://www.wsj.com/articles/the-jobs-most-exposed-to-chatgpt-e7ceebf0" target="_blank" rel="noopener">Wall Street Journal, 2023</a>; <a href="https://www.euronews.com/next/2023/03/23/openai-says-80-of-workers-could-see-their-jobs-impacted-by-ai-these-are-the-jobs-most-affe" target="_blank" rel="noopener">Euronews, 2023</a>; <a href="https://medium.com/pcmag-access/openai-chatgpt-could-disrupt-19-of-us-jobs-da1eee2f8231" target="_blank" rel="noopener">Kan, 2023</a>; <a href="https://www.vice.com/en/article/openai-research-says-80-of-us-workers-will-have-jobs-impacted-by-gpt/" target="_blank" rel="noopener">Vice, 2023</a>; <a href="https://the-decoder.com/openai-job-market-study-gpt-4/" target="_blank" rel="noopener">Bastian, 2023</a>; <a href="https://www.businesstoday.in/technology/news/story/chatgpt-maker-sam-altman-reveals-the-one-kind-of-job-that-will-vanish-soon-375014-2023-03-27" target="_blank" rel="noopener">Business Today, 2023</a>; <a href="https://www.bandt.com.au/openai-reckons-chatgpt-can-almost-definitely-make-you-redundant/" target="_blank" rel="noopener">B&amp;T Magazine, 2023</a>; <a href="https://www.sanders.senate.gov/wp-content/uploads/10.6.2025-The-Big-Tech-Oligarchs-War-Against-Workers.pdf" target="_blank" rel="noopener">U.S. Senate Committee on Health, Education, Labor and Pensions, Minority Staff, 2025</a>; <a href="https://www.philadelphiafed.org/-/media/FRBP/Assets/Community-Development/Reports/report-Oct2025-occupational-exposure-to-generative-ai-in-the-third-federal-reserve-district.pdf" target="_blank" rel="noopener">Scavette et al., 2025</a>; <a href="https://sdgs.un.org/sites/default/files/2024-05/Gmyrek;%20Berg;%20Bescond_Generative%20AI%20and%20Jobs.pdf" target="_blank" rel="noopener">Gmyrek et al., 2024</a>]</span>. Re-weighting tasks by time share substantially modifies this set: <strong>11 of the top 25 occupations swap out, 9 of them clerical or customer-service roles.</strong> Time weights de-emphasize transactional tasks — updating a record, processing a claim, answering an inquiry — because the overall time spent on them is limited, and elevate analytical occupations whose one or two exposed tasks (research, drafting, modeling) consume a lot of time.
+        Government, industry, and the public are intensely concerned with how AI will affect jobs, and the most-exposed-occupation lists from prior work are widely covered in press — by the <a href="https://www.wsj.com/articles/the-jobs-most-exposed-to-chatgpt-e7ceebf0" target="_blank" rel="noopener">Wall Street Journal</a>, <a href="https://www.euronews.com/next/2023/03/23/openai-says-80-of-workers-could-see-their-jobs-impacted-by-ai-these-are-the-jobs-most-affe" target="_blank" rel="noopener">Euronews</a>, <a href="https://medium.com/pcmag-access/openai-chatgpt-could-disrupt-19-of-us-jobs-da1eee2f8231" target="_blank" rel="noopener">PCMag</a>, <a href="https://www.vice.com/en/article/openai-research-says-80-of-us-workers-will-have-jobs-impacted-by-gpt/" target="_blank" rel="noopener">Vice</a>, <a href="https://the-decoder.com/openai-job-market-study-gpt-4/" target="_blank" rel="noopener">The Decoder</a>, <a href="https://www.businesstoday.in/technology/news/story/chatgpt-maker-sam-altman-reveals-the-one-kind-of-job-that-will-vanish-soon-375014-2023-03-27" target="_blank" rel="noopener">Business Today</a>, and <a href="https://www.bandt.com.au/openai-reckons-chatgpt-can-almost-definitely-make-you-redundant/" target="_blank" rel="noopener">B&amp;T Magazine</a> — and in policy reports from the <a href="https://www.sanders.senate.gov/wp-content/uploads/10.6.2025-The-Big-Tech-Oligarchs-War-Against-Workers.pdf" target="_blank" rel="noopener">U.S. Senate HELP Committee</a>, the <a href="https://www.philadelphiafed.org/-/media/FRBP/Assets/Community-Development/Reports/report-Oct2025-occupational-exposure-to-generative-ai-in-the-third-federal-reserve-district.pdf" target="_blank" rel="noopener">Philadelphia Fed</a>, and the <a href="https://sdgs.un.org/sites/default/files/2024-05/Gmyrek;%20Berg;%20Bescond_Generative%20AI%20and%20Jobs.pdf" target="_blank" rel="noopener">ILO</a>. Re-weighting tasks by time share substantially modifies this set: <strong>11 of the top 25 occupations swap out, 9 of them clerical or customer-service roles.</strong> Time weights de-emphasize transactional tasks — updating a record, processing a claim, answering an inquiry — because the overall time spent on them is limited, and elevate analytical occupations whose one or two exposed tasks (research, drafting, modeling) consume a lot of time.
       </p>
     </div>
 
@@ -263,8 +257,8 @@
           <div class="control">
             <label>Exposure threshold</label>
             <div class="seg" id="f4thresh">
-              <button data-t="0.25" class="active">Moderate&nbsp;(&gt;25% time saved)</button>
-              <button data-t="0.5">High&nbsp;(&gt;50% time saved)</button>
+              <button data-t="0.25" class="active">Moderate&nbsp;(&ge;25% time saved)</button>
+              <button data-t="0.5">High&nbsp;(&ge;50% time saved)</button>
             </div>
           </div>
           <div class="control">
@@ -283,7 +277,7 @@
         <div class="chart-host" id="f4Chart" style="position:relative;"></div>
       </div>
       <div class="figure-cap">
-        <b>Figure 4.</b> Fraction of occupations at or above a given fraction of tasks exposed to LMs, under rubric-based [Eloundou et al., 2024] and simulation-based [Wan et al., 2026] exposure measures, across 858 occupations. Each curve compares weighting tasks by our time-share estimates <em>s(t, o)</em> against the core/supplemental weighting of Eloundou et al. [2024]. The moderate panel labels a task exposed at a &gt;25% time-saved threshold; the high panel at &gt;50%.
+        <b>Figure 4.</b> Fraction of occupations at or above a given fraction of tasks exposed to LMs, under rubric-based [Eloundou et al., 2024] and simulation-based [Wan et al., 2026] exposure measures, across 858 occupations. Each curve compares weighting tasks by our time-share estimates <em>s(t, o)</em> against the core/supplemental weighting of Eloundou et al. [2024]. The moderate panel labels a task exposed at a &ge;25% time-saved threshold; the high panel at &ge;50%.
       </div>
     </div>
   </div>

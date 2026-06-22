@@ -55,7 +55,6 @@ function f1Render() {
 async function initFigure1() {
   F1.data = await loadJSON("data/occupations.json");
   F1.code = F1.data.default;
-  document.getElementById("occName").textContent = F1.data.occupations[F1.code].title;
   f1Render();
 }
 
