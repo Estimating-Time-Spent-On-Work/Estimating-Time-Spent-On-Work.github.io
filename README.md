@@ -15,7 +15,9 @@ python3 -m http.server 8753
 - `app.js` — interactive Figure 1 (occupation explorer) and Figure 4 (survival CDF),
   plus the full top-25 tables (Tables 5 & 6, sortable).
 - `assets/figure2_method.png`, `figure3_wsj.png` — rendered from the PDF.
-- `Estimating_Task_Time_Share_Release.pdf` — linked from the hero.
+- `Estimating_Task_Time_Share_Release.pdf` — linked from the footer, and kept at its
+  published URL so existing links to it keep working. The hero's "Read the Paper"
+  button goes to arXiv (2608.05172); this file must stay regardless.
 - `data/occupations.json` — per-occupation task time shares + rubric/simulation
   exposure flags for 876 occupations (Figure 1).
 - `data/fig4_cdf.json` — 8 real survival-CDF series for Figure 4.
